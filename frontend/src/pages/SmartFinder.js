@@ -1320,7 +1320,6 @@ const SmartFinder = () => {
     setShowGuide(true);
   };
   const closeGuide = () => setShowGuide(false);
-  const nextGuide = () => setGuideIndex((i) => Math.min(i + 1, guideSteps.length - 1));
 
   // Load saved state from localStorage
   const loadSavedState = () => {
@@ -1467,7 +1466,7 @@ const SmartFinder = () => {
   const removeIngredient = (ingredient) => {
     setIngredients(prev => prev.filter(ing => ing !== ingredient));
     toast.success(`Removed "${ingredient}"`, {
-      icon: '🗑��',
+      icon: '🗑️',
       style: {
         borderRadius: '12px',
         background: '#718096',
@@ -2336,7 +2335,7 @@ const SmartFinder = () => {
                         {selectedRecipe.extendedIngredients ? (
                           selectedRecipe.extendedIngredients.map((ingredient, index) => (
                             <div key={index} className="ingredient-item">
-                              <div className="ingredient-icon">🥄</div>
+                              <div className="ingredient-icon">��</div>
                               <div className="ingredient-text">{ingredient.original}</div>
                               <div className="ingredient-amount">
                                 {ingredient.amount ? `${ingredient.amount} ${ingredient.unit}` : ''}
