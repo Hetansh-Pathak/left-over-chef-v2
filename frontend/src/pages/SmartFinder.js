@@ -23,6 +23,8 @@ import {
   FaAward
 } from 'react-icons/fa';
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 
 // Configurable savings assumptions (₹)
 const SAVINGS_CONFIG = {
