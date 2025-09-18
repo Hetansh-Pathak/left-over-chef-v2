@@ -25,10 +25,17 @@ export const AuthProvider = ({ children }) => {
       const savedFavorites = localStorage.getItem('userFavorites');
 
       if (token && userData) {
-        setIsAuthenticated(true);
-        setUser(JSON.parse(userData));
-        // Set axios default authorization header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        try {
+          const parsed = JSON.parse(userData);
+          setIsAuthenticated(true);
+          setUser(parsed);
+          // Set axios default authorization header
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        } catch (e) {
+          console.error('Corrupted userData in localStorage, clearing.', e);
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('userData');
+        }
       }
 
       // Load saved favorites
@@ -39,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Error loading favorites:', error);
           setFavorites(new Set());
+          localStorage.removeItem('userFavorites');
         }
       }
 
