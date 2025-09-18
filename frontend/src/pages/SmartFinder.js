@@ -411,6 +411,26 @@ const ActionButton = styled(motion.button).withConfig({
   }
 `;
 
+const SavingsBanner = styled.div`
+  margin-top: 0.75rem;
+  background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+`;
+
+const StepCounter = styled.div`
+  text-align: center;
+  color: #718096;
+  margin-bottom: 0.5rem;
+`;
+
+const GuideStep = styled.div`
+  margin-bottom: 1rem;
+`;
+
 const QuickSuggestions = styled.div`
   margin-top: 2rem;
   
@@ -2092,17 +2112,9 @@ const SmartFinder = () => {
                         {hasSearched && (() => {
                           const s = computeSavings();
                           return (
-                            <div className="savings-banner" style={{
-                              marginTop: '0.75rem',
-                              background: 'linear-gradient(135deg, #48BB78 0%, #38A169 100%)',
-                              color: 'white',
-                              padding: '0.5rem 0.75rem',
-                              borderRadius: '12px',
-                              fontWeight: 700,
-                              fontSize: '0.95rem'
-                            }}>
+                            <SavingsBanner>
                               {s.text}
-                            </div>
+                            </SavingsBanner>
                           );
                         })()}
                         
@@ -2244,13 +2256,13 @@ const SmartFinder = () => {
                   const locked = !isAuthenticated && guideIndex >= 2;
                   return (
                     <div>
-                      <div className="instruction-step" style={{ marginBottom: '1rem' }}>
+                      <GuideStep className="instruction-step">
                         <div className="step-number">{Math.min(guideIndex + 1, limit)}</div>
                         <div className="step-text">{locked ? '🔒 Sign up to unlock the full step-by-step cooking mode.' : guideSteps[guideIndex]}</div>
-                      </div>
-                      <div style={{ textAlign: 'center', color: '#718096', marginBottom: '0.5rem' }}>
+                      </GuideStep>
+                      <StepCounter>
                         Step {Math.min(guideIndex + 1, limit)} / {limit}
-                      </div>
+                      </StepCounter>
                       <div className="modal-actions">
                         <button className="modal-btn secondary" onClick={closeGuide}>Close</button>
                         <button
