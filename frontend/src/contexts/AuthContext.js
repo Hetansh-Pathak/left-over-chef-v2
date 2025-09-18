@@ -88,7 +88,14 @@ export const AuthProvider = ({ children }) => {
     } else {
       newFavorites.add(recipeId);
       // Store recipe data for later retrieval
-      const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes') || '{}');
+      let favoriteRecipes = {};
+      try {
+        const raw = localStorage.getItem('favoriteRecipes');
+        favoriteRecipes = raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.error('Corrupted favoriteRecipes in localStorage, resetting.', e);
+        localStorage.removeItem('favoriteRecipes');
+      }
       favoriteRecipes[recipeId] = {
         id: recipeId,
         title: recipe.title || recipe.name,
