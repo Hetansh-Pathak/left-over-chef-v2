@@ -107,9 +107,6 @@ const splitSteps = (recipe) => {
     'Plate and serve.'
   ];
 };
-import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-
 const FinderContainer = styled(motion.div)`
   max-width: 1400px;
   margin: 0 auto;
@@ -1470,7 +1467,7 @@ const SmartFinder = () => {
   const removeIngredient = (ingredient) => {
     setIngredients(prev => prev.filter(ing => ing !== ingredient));
     toast.success(`Removed "${ingredient}"`, {
-      icon: '🗑️',
+      icon: '🗑��',
       style: {
         borderRadius: '12px',
         background: '#718096',
