@@ -2034,8 +2034,12 @@ const SmartFinder = () => {
                           src={getRecipeImage(recipe, index)}
                           alt={recipe.title || recipe.name}
                           className="recipe-image"
+                          loading="lazy"
                           onError={(e) => {
-                            e.target.src = getRecipeImage(recipe, index + 1);
+                            const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
+                            const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
+                            const fallbackIndex = (hashString(title + cuisine) + index) % FALLBACK_IMAGES.length;
+                            e.target.src = FALLBACK_IMAGES[fallbackIndex];
                           }}
                         />
                         
