@@ -26,7 +26,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
-// Configurable savings assumptions (₹)
+// Configurable savings assumptions (���)
 const SAVINGS_CONFIG = {
   deliveryCost: 250,
   ingredientCost: 50,
@@ -1505,20 +1505,22 @@ const SmartFinder = () => {
   // Multiple API Integration
   const searchRecipesFromMultipleAPIs = async (searchIngredients) => {
     const allRecipes = [];
-    
+
     try {
       // API 1: Our enhanced local search with Spoonacular
       const primaryResponse = await axios.post('/api/recipes/search-by-ingredients', {
         ingredients: searchIngredients,
         matchType: 'any',
         useSpoonacular: true,
-        limit: 30,
+        limit: 24,
         filters
-      });
-      
+      }, { timeout: 7000 });
+
       if (primaryResponse.data.recipes) {
         allRecipes.push(...primaryResponse.data.recipes);
       }
+
+      if (allRecipes.length >= 20) return allRecipes;
 
       // API 2: Recipe Puppy API (for additional variety)
       try {
