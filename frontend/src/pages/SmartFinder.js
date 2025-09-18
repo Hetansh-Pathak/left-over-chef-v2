@@ -65,20 +65,10 @@ const getRecipeImage = (recipe, index = 0) => {
   if (recipe?.image) return recipe.image;
   const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
   const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
-  let imageIndex = (hashString(title + cuisine) + index) % FALLBACK_IMAGES.length;
-
-  if (title.includes('dal') || title.includes('curry') || cuisine.includes('indian')) {
-    const choices = [0, 5, 7];
-    imageIndex = choices[(hashString(title) + index) % choices.length];
-  } else if (title.includes('pizza') || cuisine.includes('italian')) {
-    const choices = [1, 3];
-    imageIndex = choices[(hashString(title) + index) % choices.length];
-  } else if (title.includes('salad')) {
-    const choices = [2, 7];
-    imageIndex = choices[(hashString(title) + index) % choices.length];
-  }
-
-  return FALLBACK_IMAGES[imageIndex];
+  const terms = [title, cuisine].filter(Boolean).join(' ');
+  const sig = (hashString(terms) + index) % 1000;
+  const query = encodeURIComponent(terms || 'food dish');
+  return `https://source.unsplash.com/636x393/?${query}&sig=${sig}`;
 };
 
 const splitSteps = (recipe) => {
