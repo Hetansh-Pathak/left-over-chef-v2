@@ -26,6 +26,78 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
+// Configurable savings assumptions (₹)
+const SAVINGS_CONFIG = {
+  deliveryCost: 250,
+  ingredientCost: 50,
+};
+
+const computeSavings = (delivery = SAVINGS_CONFIG.deliveryCost, ingredient = SAVINGS_CONFIG.ingredientCost) => {
+  const amount = Math.max(0, delivery - ingredient);
+  return { amount, text: `🎉 You just saved ₹${amount} by using leftovers instead of ordering food!` };
+};
+
+// Hash util for consistent image selection
+const hashString = (str = '') => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+};
+
+// Diverse local fallback images to avoid duplicates when recipe.image missing
+const FALLBACK_IMAGES = [
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=636&h=393&fit=crop&auto=format&q=80', // Indian curry
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=636&h=393&fit=crop&auto=format&q=80', // Pizza
+  'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=636&h=393&fit=crop&auto=format&q=80', // Salad
+  'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=636&h=393&fit=crop&auto=format&q=80', // Pasta
+  'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=636&h=393&fit=crop&auto=format&q=80', // Stir fry
+  'https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=636&h=393&fit=crop&auto=format&q=80', // Chicken dish
+  'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=636&h=393&fit=crop&auto=format&q=80', // Veg bowl
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=636&h=393&fit=crop&auto=format&q=80', // Mediterranean
+  'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=636&h=393&fit=crop&auto=format&q=80', // Soup
+  'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=636&h=393&fit=crop&auto=format&q=80'  // Sandwich
+];
+
+const getRecipeImage = (recipe, index = 0) => {
+  const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
+  const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
+  const terms = [title, cuisine].filter(Boolean).join(' ');
+  const sig = (hashString(terms) + index) % 1000;
+  const query = encodeURIComponent(terms || 'food dish');
+  return `https://source.unsplash.com/636x393/?${query}&sig=${sig}`;
+};
+
+const splitSteps = (recipe) => {
+  if (recipe?.analyzedInstructions?.[0]?.steps?.length) {
+    return recipe.analyzedInstructions[0].steps.map(s => s.step || s.text).filter(Boolean);
+  }
+  const raw = (recipe?.instructions || '')
+    .replace(/<[^>]*>/g, ' ')
+    .split(/\n|\.|\r/)
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (raw.length) return raw;
+  const title = (recipe?.title || '').toLowerCase();
+  if (title.includes('dal') || title.includes('curry')) {
+    return [
+      'Heat oil or ghee and sauté onions until golden.',
+      'Add ginger-garlic, then spices (cumin, coriander, turmeric).',
+      'Add tomatoes and cook down to a masala.',
+      'Add lentils/ingredients with water and simmer until tender.',
+      'Season, garnish with coriander, and serve hot.'
+    ];
+  }
+  return [
+    'Prep ingredients and heat pan.',
+    'Cook aromatics until fragrant.',
+    'Add main ingredients and seasonings.',
+    'Simmer/cook until done.',
+    'Plate and serve.'
+  ];
+};
 const FinderContainer = styled(motion.div)`
   max-width: 1400px;
   margin: 0 auto;
@@ -326,6 +398,26 @@ const ActionButton = styled(motion.button).withConfig({
   .button-icon {
     font-size: 1.2rem;
   }
+`;
+
+const SavingsBanner = styled.div`
+  margin-top: 0.75rem;
+  background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+`;
+
+const StepCounter = styled.div`
+  text-align: center;
+  color: #718096;
+  margin-bottom: 0.5rem;
+`;
+
+const GuideStep = styled.div`
+  margin-bottom: 1rem;
 `;
 
 const QuickSuggestions = styled.div`
@@ -1224,7 +1316,21 @@ const ModalBody = styled.div`
 `;
 
 const SmartFinder = () => {
-  const { favorites, toggleFavorite, isFavorite } = useAuth();
+  const { favorites, toggleFavorite, isFavorite, isAuthenticated, user } = useAuth();
+
+  const [showGuide, setShowGuide] = React.useState(false);
+  const [guideSteps, setGuideSteps] = React.useState([]);
+  const [guideIndex, setGuideIndex] = React.useState(0);
+  const [guideRecipe, setGuideRecipe] = React.useState(null);
+
+  const openGuide = (recipe) => {
+    const steps = splitSteps(recipe);
+    setGuideSteps(steps);
+    setGuideIndex(0);
+    setGuideRecipe(recipe);
+    setShowGuide(true);
+  };
+  const closeGuide = () => setShowGuide(false);
 
   // Load saved state from localStorage
   const loadSavedState = () => {
@@ -1388,20 +1494,22 @@ const SmartFinder = () => {
   // Multiple API Integration
   const searchRecipesFromMultipleAPIs = async (searchIngredients) => {
     const allRecipes = [];
-    
+
     try {
       // API 1: Our enhanced local search with Spoonacular
       const primaryResponse = await axios.post('/api/recipes/search-by-ingredients', {
         ingredients: searchIngredients,
         matchType: 'any',
         useSpoonacular: true,
-        limit: 30,
+        limit: 24,
         filters
-      });
-      
+      }, { timeout: 7000 });
+
       if (primaryResponse.data.recipes) {
         allRecipes.push(...primaryResponse.data.recipes);
       }
+
+      if (allRecipes.length >= 20) return allRecipes;
 
       // API 2: Recipe Puppy API (for additional variety)
       try {
@@ -1675,7 +1783,7 @@ const SmartFinder = () => {
     return badges;
   };
 
-  const sortedRecipes = sortRecipes(recipes);
+  const sortedRecipes = React.useMemo(() => sortRecipes(recipes), [recipes, sortBy]);
 
   return (
     <FinderContainer
@@ -1922,11 +2030,15 @@ const SmartFinder = () => {
                     >
                       <div className="recipe-image-container">
                         <img
-                          src={recipe.image || `https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=636&h=393&fit=crop&auto=format&q=80`}
+                          src={getRecipeImage(recipe, index)}
                           alt={recipe.title || recipe.name}
                           className="recipe-image"
+                          loading="lazy"
                           onError={(e) => {
-                            e.target.src = `https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=636&h=393&fit=crop&auto=format&q=80`;
+                            const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
+                            const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
+                            const fallbackIndex = (hashString(title + cuisine) + index) % FALLBACK_IMAGES.length;
+                            e.target.src = FALLBACK_IMAGES[fallbackIndex];
                           }}
                         />
                         
@@ -1992,6 +2104,14 @@ const SmartFinder = () => {
                           </span>
                           <span className="rating-label">rating</span>
                         </div>
+                        {hasSearched && (() => {
+                          const s = computeSavings();
+                          return (
+                            <SavingsBanner>
+                              {s.text}
+                            </SavingsBanner>
+                          );
+                        })()}
                         
                         <div className="recipe-actions">
                           <button
@@ -2014,6 +2134,37 @@ const SmartFinder = () => {
                           >
                             <FaEye />
                             View Recipe
+                          </button>
+                          <button
+                            className="action-btn primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openGuide(recipe);
+                            }}
+                          >
+                            👨‍🍳 Start Cooking
+                          </button>
+                          <button
+                            className="action-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const link = (() => {
+                                const id = recipe._id || recipe.id || (recipe.title || 'recipe').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+                                const origin = window.location.origin;
+                                return isAuthenticated ? `${origin}/recipe/${id}` : origin;
+                              })();
+                              const text = `I made this with my leftovers 💚 – Try it here: ${link}`;
+                              if (navigator.share) {
+                                navigator.share({ title: recipe.title, text, url: link }).catch(()=>{});
+                                toast.success('Share dialog opened');
+                              } else {
+                                navigator.clipboard.writeText(text).then(() => {
+                                  toast.success('✅ Link copied to clipboard!');
+                                }).catch(() => toast.success('✅ Link copied to clipboard!'));
+                              }
+                            }}
+                          >
+                            <FaShare /> Share Recipe
                           </button>
                         </div>
                       </div>
@@ -2063,6 +2214,68 @@ const SmartFinder = () => {
               </EmptyState>
             )}
           </ResultsSection>
+        )}
+      </AnimatePresence>
+
+      {/* Step-by-step Cooking Guide */}
+      <AnimatePresence>
+        {showGuide && guideRecipe && (
+          <ModalOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeGuide}
+          >
+            <ModalContent
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ModalHeader>
+                <img
+                  src={getRecipeImage(guideRecipe)}
+                  alt={guideRecipe.title}
+                  className="modal-image"
+                />
+                <button className="modal-close" onClick={closeGuide}>
+                  <FaTimes />
+                </button>
+                <div className="modal-title">
+                  <h2>Cooking Guide: {guideRecipe.title}</h2>
+                </div>
+              </ModalHeader>
+              <ModalBody>
+                {(() => {
+                  const limit = isAuthenticated ? guideSteps.length : Math.min(2, guideSteps.length);
+                  const locked = !isAuthenticated && guideIndex >= 2;
+                  return (
+                    <div>
+                      <GuideStep className="instruction-step">
+                        <div className="step-number">{Math.min(guideIndex + 1, limit)}</div>
+                        <div className="step-text">{locked ? '🔒 Sign up to unlock the full step-by-step cooking mode.' : guideSteps[guideIndex]}</div>
+                      </GuideStep>
+                      <StepCounter>
+                        Step {Math.min(guideIndex + 1, limit)} / {limit}
+                      </StepCounter>
+                      <div className="modal-actions">
+                        <button className="modal-btn secondary" onClick={closeGuide}>Close</button>
+                        <button
+                          className="modal-btn primary"
+                          onClick={() => {
+                            if (locked) return;
+                            if (guideIndex + 1 < limit) setGuideIndex(guideIndex + 1);
+                          }}
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </ModalBody>
+            </ModalContent>
+          </ModalOverlay>
         )}
       </AnimatePresence>
 
@@ -2131,7 +2344,7 @@ const SmartFinder = () => {
                         {selectedRecipe.extendedIngredients ? (
                           selectedRecipe.extendedIngredients.map((ingredient, index) => (
                             <div key={index} className="ingredient-item">
-                              <div className="ingredient-icon">🥄</div>
+                              <div className="ingredient-icon">��</div>
                               <div className="ingredient-text">{ingredient.original}</div>
                               <div className="ingredient-amount">
                                 {ingredient.amount ? `${ingredient.amount} ${ingredient.unit}` : ''}
