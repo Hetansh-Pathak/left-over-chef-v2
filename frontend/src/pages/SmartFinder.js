@@ -62,7 +62,6 @@ const FALLBACK_IMAGES = [
 ];
 
 const getRecipeImage = (recipe, index = 0) => {
-  if (recipe?.image) return recipe.image;
   const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
   const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
   const terms = [title, cuisine].filter(Boolean).join(' ');
