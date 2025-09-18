@@ -26,7 +26,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
-// Configurable savings assumptions (���)
+// Configurable savings assumptions (₹)
 const SAVINGS_CONFIG = {
   deliveryCost: 250,
   ingredientCost: 50,
@@ -1794,7 +1794,7 @@ const SmartFinder = () => {
     return badges;
   };
 
-  const sortedRecipes = sortRecipes(recipes);
+  const sortedRecipes = React.useMemo(() => sortRecipes(recipes), [recipes, sortBy]);
 
   return (
     <FinderContainer
