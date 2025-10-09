@@ -171,6 +171,38 @@ const splitSteps = (recipe) => {
     'Plate and serve.'
   ];
 };
+
+const computeGreenScore = (recipe = {}, inputIngredients = []) => {
+  const title = (recipe.title || recipe.name || '').toLowerCase();
+  const list = (recipe.extendedIngredients || []).map(i => (i.original || i.name || '').toLowerCase());
+  const text = (title + ' ' + list.join(' ')).toLowerCase();
+  let score = 50;
+  const isVeg = /(dal|lentil|chana|rajma|paneer|tofu|veg|vegetable|sabzi|bhaji|salad|thepla|kadhi|khichdi)/.test(text);
+  const hasLegumes = /(dal|lentil|chickpea|chana|rajma|moong|masoor)/.test(text);
+  const hasRedMeat = /(mutton|beef|pork|lamb)/.test(text);
+  const hasPoultry = /(chicken|turkey)/.test(text);
+  score += isVeg ? 25 : 0;
+  score += hasLegumes ? 15 : 0;
+  score -= hasRedMeat ? 20 : 0;
+  score -= hasPoultry ? 10 : 0;
+  const time = recipe.readyInMinutes || 30;
+  score += time <= 25 ? 10 : time <= 45 ? 5 : 0;
+  const match = inputIngredients.length ? (inputIngredients.filter(i => text.includes(i.toLowerCase())).length / Math.max(1, inputIngredients.length)) : 0;
+  score += match >= 0.7 ? 10 : match >= 0.4 ? 5 : 0;
+  return Math.max(0, Math.min(100, Math.round(score)));
+};
+
+const getEcoBadges = (recipe, inputIngredients) => {
+  const badges = [];
+  const score = computeGreenScore(recipe, inputIngredients);
+  if (score >= 80) badges.push({ text: 'Eco Hero', className: 'eco' });
+  const text = (recipe.title || recipe.name || '').toLowerCase() + ' ' + (recipe.extendedIngredients||[]).map(i=> (i.original||'').toLowerCase()).join(' ');
+  const zeroWaste = inputIngredients.length > 0 && inputIngredients.every(i => text.includes(i.toLowerCase()));
+  if (zeroWaste) badges.push({ text: 'Zero Waste Chef', className: 'zeroWaste' });
+  badges.push({ text: `Green ${score}`, className: 'eco' });
+  return badges;
+};
+
 const FinderContainer = styled(motion.div)`
   max-width: 1400px;
   margin: 0 auto;
