@@ -1805,6 +1805,8 @@ const SmartFinder = () => {
     return allRecipes;
   };
 
+  const [loadingPhrase, setLoadingPhrase] = useState('');
+
   const searchRecipes = async () => {
     if (ingredients.length === 0) {
       toast.error('Please add at least one ingredient!', {
@@ -2831,7 +2833,7 @@ const SmartFinder = () => {
                     </div>
 
                     <div className="recipe-tips">
-                      <h4>💡 Chef's Tips</h4>
+                      <h4>�� Chef's Tips</h4>
                       <ul>
                         <li>Taste and adjust seasonings as you cook for the best flavor balance.</li>
                         <li>Use fresh ingredients when possible for maximum taste and nutrition.</li>
