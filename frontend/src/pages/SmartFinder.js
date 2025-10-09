@@ -2126,11 +2126,13 @@ const SmartFinder = () => {
 
           <ActionButton
             onClick={() => {
-              const utter = new SpeechSynthesisUtterance();
-              const text = ingredients.length ? `Searching recipes with ${ingredients.join(', ')}` : 'Add ingredients or try Surprise Me.';
-              utter.text = text;
-              utter.lang = 'en-IN';
-              window.speechSynthesis?.speak(utter);
+              try {
+                const utter = new SpeechSynthesisUtterance();
+                const text = ingredients.length ? `Searching recipes with ${ingredients.join(', ')}` : 'Add ingredients or try Surprise Me.';
+                utter.text = text;
+                utter.lang = 'en-IN';
+                window.speechSynthesis && window.speechSynthesis.speak(utter);
+              } catch {}
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
