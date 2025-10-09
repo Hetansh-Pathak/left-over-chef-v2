@@ -599,7 +599,7 @@ const SuggestionChip = styled(motion.button)`
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -607,6 +607,61 @@ const SuggestionChip = styled(motion.button)`
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
     border-color: transparent;
   }
+`;
+
+const SpecialsSection = styled.div`
+  margin-top: 2rem;
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #2D3748;
+    margin-bottom: 1rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+`;
+
+const SpecialCard = styled(motion.div)`
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  }
+`;
+
+const SpecialImage = styled.div`
+  height: 180px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 12px;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+`;
+
+const SpecialTitle = styled.div`
+  font-weight: 800;
+  color: #2D3748;
+  margin-bottom: 6px;
+`;
+
+const SpecialSummary = styled.div`
+  color: #718096;
+  font-size: 0.9rem;
 `;
 
 const ResultsSection = styled(motion.div)`
