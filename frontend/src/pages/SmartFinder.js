@@ -2037,7 +2037,9 @@ const SmartFinder = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <Header
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <Header
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.8 }}
@@ -2912,6 +2914,13 @@ const SmartFinder = () => {
           </ModalOverlay>
         )}
       </AnimatePresence>
+        </div>
+        <div style={{ width: 340 }}>
+          <PantryPanel />
+          <div style={{ height: 16 }} />
+          <AchievementsPanel />
+        </div>
+      </div>
     </FinderContainer>
   );
 };
