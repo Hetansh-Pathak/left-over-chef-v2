@@ -1885,7 +1885,6 @@ const SmartFinder = () => {
     if (recipe.aggregateLikes && recipe.aggregateLikes > 100) {
       badges.push({ text: 'Popular', className: 'popular' });
     }
-    // Check for Indian cuisine
     if ((recipe.cuisines && recipe.cuisines.some(c => c.toLowerCase().includes('indian'))) ||
         (recipe.title && (recipe.title.toLowerCase().includes('curry') ||
                          recipe.title.toLowerCase().includes('dal') ||
@@ -1893,6 +1892,8 @@ const SmartFinder = () => {
                          recipe.title.toLowerCase().includes('chapati')))) {
       badges.push({ text: 'Indian', className: 'indian' });
     }
+    const eco = getEcoBadges(recipe, inputIngredients);
+    eco.forEach(b => badges.push(b));
     return badges;
   };
 
