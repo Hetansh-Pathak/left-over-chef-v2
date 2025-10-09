@@ -2039,6 +2039,13 @@ const SmartFinder = () => {
           Specializing in Indian cuisine and authentic flavors.
         </p>
         <div className="stats">
+          {isSearching && (
+            <ChefMascot>
+              <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+                🍳
+              </motion.div>
+            </ChefMascot>
+          )}
           <div className="stat-item">
             <FaUtensils className="stat-icon" />
             <div className="stat-number">15,000+</div>
