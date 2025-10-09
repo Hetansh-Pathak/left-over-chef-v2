@@ -2035,6 +2035,93 @@ const SmartFinder = () => {
             )}
           </ActionButton>
 
+          <ActionButton
+            onClick={() => {
+              try {
+                const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SR) {
+                  toast.error('Voice not supported in this browser');
+                  return;
+                }
+                const rec = new SR();
+                rec.lang = 'en-IN';
+                rec.interimResults = false;
+                rec.maxAlternatives = 1;
+                rec.onresult = (e) => {
+                  const transcript = e.results[0][0].transcript || '';
+                  const cleaned = transcript.toLowerCase().replace(/chef[, ]*/g,'').replace(/what can i make with /,'');
+                  const parts = cleaned.split(/,| and | with /).map(s=>s.trim()).filter(Boolean);
+                  if (parts.length) {
+                    setIngredients(Array.from(new Set(parts)));
+                    toast.success(`Heard: ${parts.join(', ')}`, { icon: '🎙️' });
+                  }
+                };
+                rec.onerror = () => {};
+                rec.start();
+              } catch (e) {
+                toast.error('Unable to start voice');
+              }
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ rotate: 10, scale: 0.98 }}
+          >
+            <FaMicrophone className="button-icon" />
+            Voice
+          </ActionButton>
+
+          <ActionButton
+            onClick={() => {
+              const utter = new SpeechSynthesisUtterance();
+              const text = ingredients.length ? `Searching recipes with ${ingredients.join(', ')}` : 'Add ingredients or try Surprise Me.';
+              utter.text = text;
+              utter.lang = 'en-IN';
+              window.speechSynthesis?.speak(utter);
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FaVolumeUp className="button-icon" />
+            Speak
+          </ActionButton>
+
+          <ActionButton
+            onClick={async () => {
+              const pool = recipes.length ? recipes : GUJARATI_SPECIALS;
+              const pick = pool[Math.floor(Math.random()*pool.length)];
+              setSelectedRecipe(pick);
+              setShowModal(true);
+              // confetti burst
+              const end = Date.now() + 800;
+              const frame = () => {
+                const colors = ['#667eea','#764ba2','#22c55e','#f59e0b','#ef4444'];
+                const el = document.createElement('div');
+                el.style.position='fixed';
+                el.style.top='-10px';
+                el.style.left=Math.random()*100+'%';
+                el.style.width='8px';
+                el.style.height='8px';
+                el.style.borderRadius='50%';
+                el.style.background=colors[Math.floor(Math.random()*colors.length)];
+                el.style.zIndex=99999;
+                el.style.transform=`translateY(0)`;
+                el.style.transition='transform 1s ease, opacity 1s ease';
+                document.body.appendChild(el);
+                requestAnimationFrame(()=>{
+                  el.style.transform=`translateY(${window.innerHeight+20}px)`;
+                  el.style.opacity='0';
+                });
+                setTimeout(()=>document.body.removeChild(el),1200);
+                if (Date.now()<end) requestAnimationFrame(frame);
+              };
+              frame();
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ rotate: 360, scale: 0.95 }}
+          >
+            <FaRandom className="button-icon" />
+            Surprise Me
+          </ActionButton>
+
           {ingredients.length > 0 && (
             <ActionButton
               onClick={clearAll}
