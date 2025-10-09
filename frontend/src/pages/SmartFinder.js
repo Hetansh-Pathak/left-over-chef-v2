@@ -2246,31 +2246,6 @@ const SmartFinder = () => {
           </div>
         </QuickSuggestions>
 
-        <SpecialsSection>
-          <div className="title"><FaStar className="title-icon" /> Gujarati Specials</div>
-          <div className="grid">
-            {GUJARATI_SPECIALS.map((r, idx) => (
-              <SpecialCard
-                key={r.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 * idx, duration: 0.4 }}
-                onClick={() => { setSelectedRecipe(r); setShowModal(true); }}
-              >
-                <SpecialImage>
-                  <img src={r.image} alt={r.title} onError={(e) => { try { e.target.onerror = null; e.target.src = r.fallback || FALLBACK_IMAGES[(hashString(r.id||r.title)+idx) % FALLBACK_IMAGES.length]; } catch (err) {} }} />
-                </SpecialImage>
-                <SpecialTitle>{r.title}</SpecialTitle>
-                <SpecialSummary>{r.summary}</SpecialSummary>
-                <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <SuggestionChip whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={(e) => { e.stopPropagation(); setIngredients(['dal','wheat flour','ghee','peanuts']); toast.success('Ingredients added for Dal Dhokli', { icon: '🍲' }); }}>Dal Dhokli</SuggestionChip>
-                  <SuggestionChip whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={(e) => { e.stopPropagation(); setIngredients(['besan','mustard seeds','green chili','curd']); toast.success('Ingredients added for Khaman Dhokla', { icon: '🟡' }); }}>Khaman Dhokla</SuggestionChip>
-                  <SuggestionChip whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={(e) => { e.stopPropagation(); setIngredients(['methi','wheat flour','yogurt','spices']); toast.success('Ingredients added for Methi Thepla', { icon: '🫓' }); }}>Methi Thepla</SuggestionChip>
-                </div>
-              </SpecialCard>
-            ))}
-          </div>
-        </SpecialsSection>
       </SearchSection>
 
       <AnimatePresence>
