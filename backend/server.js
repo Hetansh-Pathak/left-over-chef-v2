@@ -200,11 +200,15 @@ const setupMockData = async () => {
 const recipeRoutes = require('./routes/recipes');
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
+const pantryRoutes = require('./routes/pantry');
+const achievementsRoutes = require('./routes/achievements');
 
 // API Routes
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/pantry', pantryRoutes);
+app.use('/api/achievements', achievementsRoutes);
 
 // Additional API endpoints
 
