@@ -20,7 +20,11 @@ import {
   FaSpinner,
   FaMapMarkerAlt,
   FaUser,
-  FaAward
+  FaAward,
+  FaMicrophone,
+  FaMicrophoneSlash,
+  FaVolumeUp,
+  FaRandom
 } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -1743,7 +1747,7 @@ const SmartFinder = () => {
   const generateStars = (rating) => {
     const stars = Math.floor(rating || 0);
     const hasHalf = (rating % 1) >= 0.5;
-    return '★'.repeat(stars) + (hasHalf ? '☆' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
+    return '★'.repeat(stars) + (hasHalf ? '���' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
   };
 
   const sortRecipes = (recipesToSort) => {
