@@ -1856,7 +1856,7 @@ const SmartFinder = () => {
   const generateStars = (rating) => {
     const stars = Math.floor(rating || 0);
     const hasHalf = (rating % 1) >= 0.5;
-    return '★'.repeat(stars) + (hasHalf ? '☆' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
+    return '★'.repeat(stars) + (hasHalf ? '��' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
   };
 
   const sortRecipes = (recipesToSort) => {
@@ -1874,7 +1874,7 @@ const SmartFinder = () => {
     }
   };
 
-  const getRecipeBadges = (recipe) => {
+  const getRecipeBadges = (recipe, inputIngredients) => {
     const badges = [];
     if (recipe.readyInMinutes && recipe.readyInMinutes <= 30) {
       badges.push({ text: 'Quick', className: 'quick' });
