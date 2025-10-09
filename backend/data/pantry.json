@@ -1,12 +1,7 @@
 {
   "users": {
     "demo": {
-      "items": [
-        {
-          "name": "cheese",
-          "addedAt": "2025-10-09T22:12:47.888Z"
-        }
-      ]
+      "items": []
     }
   }
 }
