@@ -2131,7 +2131,7 @@ const SmartFinder = () => {
             ) : sortedRecipes.length > 0 ? (
               <RecipeGrid>
                 {sortedRecipes.map((recipe, index) => {
-                  const badges = getRecipeBadges(recipe);
+                  const badges = getRecipeBadges(recipe, ingredients);
                   const recipeId = recipe._id || recipe.id || index;
                   
                   return (
