@@ -2155,9 +2155,18 @@ const SmartFinder = () => {
           <ActionButton
             onClick={async () => {
               const pool = recipes.length ? recipes : GUJARATI_SPECIALS;
-              const pick = pool[Math.floor(Math.random()*pool.length)];
-              setSelectedRecipe(pick);
-              setShowModal(true);
+              const poolKey = recipes.length ? 'results' : 'gujarat';
+              // reset if pool changed
+              let baseIndex = surpriseIndex;
+              if (surprisePoolKey !== poolKey) baseIndex = -1;
+              const nextIndex = (baseIndex + 1) % Math.max(1, pool.length);
+              setSurpriseIndex(nextIndex);
+              setSurprisePoolKey(poolKey);
+              const pick = pool[nextIndex];
+              if (pick) {
+                setSelectedRecipe(pick);
+                setShowModal(true);
+              }
               // confetti burst
               const end = Date.now() + 800;
               const frame = () => {
