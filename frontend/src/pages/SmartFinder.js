@@ -2035,9 +2035,12 @@ const SmartFinder = () => {
           <span className="accent">Smart Recipe</span> Finder
         </h1>
         <p className="subtitle">
-          Discover amazing recipes from around the world using your available ingredients. 
+          Discover amazing recipes from around the world using your available ingredients.
           Specializing in Indian cuisine and authentic flavors.
         </p>
+        {isSearching && (
+          <div style={{ marginTop: 12, fontWeight: 700, color: '#2D3748' }}>{loadingPhrase}</div>
+        )}
         <div className="stats">
           {isSearching && (
             <ChefMascot>
