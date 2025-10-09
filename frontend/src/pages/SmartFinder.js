@@ -30,8 +30,6 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import gujaratiImageMap from '../data/gujaratiImageMap.json';
-import PantryPanel from '../components/PantryPanel';
-import AchievementsPanel from '../components/AchievementsPanel';
 
 const normalizeKey = (s = '') => s.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
 
@@ -2914,11 +2912,6 @@ const SmartFinder = () => {
           </ModalOverlay>
         )}
       </AnimatePresence>
-        </div>
-        <div style={{ width: 340 }}>
-          <PantryPanel />
-          <div style={{ height: 16 }} />
-          <AchievementsPanel />
         </div>
       </div>
     </FinderContainer>

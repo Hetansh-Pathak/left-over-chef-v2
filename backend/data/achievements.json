@@ -1,3 +1,17 @@
 {
-  "users": {}
+  "users": {
+    "demo": {
+      "achievements": [
+        {
+          "name": "Master of Leftovers",
+          "description": "Cooked 10 recipes from leftovers",
+          "category": "general",
+          "unlockedAt": "2025-10-09T22:12:38.223Z",
+          "points": 50
+        }
+      ],
+      "points": 50,
+      "streak": 0
+    }
+  }
 }

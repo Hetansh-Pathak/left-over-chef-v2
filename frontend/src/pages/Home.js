@@ -2,17 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { 
-  FaSearch, 
-  FaHeart, 
-  FaStar, 
+import {
+  FaSearch,
+  FaHeart,
+  FaStar,
   FaUtensils,
   FaClock,
   FaLeaf,
   FaFire,
-  FaGlobe
+  FaGlobe,
+  FaTrophy,
+  FaShoppingBasket
 } from 'react-icons/fa';
 import axios from 'axios';
+import PantryPanel from '../components/PantryPanel';
+import AchievementsPanel from '../components/AchievementsPanel';
 
 const HomeContainer = styled(motion.div)`
   max-width: 1200px;
@@ -182,6 +186,40 @@ const FeaturedRecipeSection = styled(motion.section)`
   padding: 2rem;
   box-shadow: ${props => props.theme.shadows.card};
   margin-bottom: 2rem;
+`;
+
+const KitchenSection = styled(motion.section)`
+  margin-bottom: 2rem;
+`;
+
+const PanelsGrid = styled(motion.div)`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+`;
+
+const GallerySection = styled(motion.section)`
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: ${props => props.theme.borderRadius};
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+`;
+
+const GalleryGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+`;
+
+const GalleryItem = styled(motion.div)`
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: ${props => props.theme.shadows.card};
+  background: #fff;
+
+  img { width: 100%; height: 140px; object-fit: cover; display: block; }
 `;
 
 const SectionTitle = styled.h2`
@@ -425,6 +463,42 @@ const Home = () => {
           );
         })}
       </QuickActionsGrid>
+
+      <KitchenSection
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
+      >
+        <SectionTitle>
+          <FaShoppingBasket className="title-icon" /> Your Kitchen
+        </SectionTitle>
+        <PanelsGrid>
+          <PantryPanel />
+          <AchievementsPanel />
+        </PanelsGrid>
+      </KitchenSection>
+
+      <GallerySection
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+      >
+        <SectionTitle>
+          <FaTrophy className="title-icon" /> Inspiration Gallery
+        </SectionTitle>
+        <GalleryGrid>
+          {[ 'https://images.unsplash.com/photo-1567620832903-b006beb0113b?w=600&h=400&fit=crop&auto=format&q=80',
+             'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&h=400&fit=crop&auto=format&q=80',
+             'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&h=400&fit=crop&auto=format&q=80',
+             'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=600&h=400&fit=crop&auto=format&q=80',
+             'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=600&h=400&fit=crop&auto=format&q=80',
+             'https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=600&h=400&fit=crop&auto=format&q=80' ].map((src, i) => (
+            <GalleryItem key={i} whileHover={{ scale: 1.03 }}>
+              <img src={src} alt="delicious food" />
+            </GalleryItem>
+          ))}
+        </GalleryGrid>
+      </GallerySection>
 
       {dailyRecipe && (
         <FeaturedRecipeSection
