@@ -29,6 +29,23 @@ import {
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import gujaratiImageMap from '../data/gujaratiImageMap.json';
+
+const normalizeKey = (s = '') => s.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const getRecipeImage = (recipe = {}, index = 0) => {
+  try {
+    const title = (recipe.title || recipe.name || '').toLowerCase();
+    const key = normalizeKey(title);
+    if (key && gujaratiImageMap[key]) return gujaratiImageMap[key];
+    if (recipe.image) return recipe.image;
+    if (recipe.images && recipe.images.length) return recipe.images[0];
+    const fallbackIndex = (hashString(title + (recipe.cuisines?.[0] || '')) + index) % FALLBACK_IMAGES.length;
+    return FALLBACK_IMAGES[fallbackIndex];
+  } catch (e) {
+    return FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
+  }
+}
 
 // Configurable savings assumptions (₹)
 const SAVINGS_CONFIG = {
