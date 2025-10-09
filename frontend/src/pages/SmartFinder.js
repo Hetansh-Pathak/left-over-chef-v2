@@ -1823,6 +1823,13 @@ const SmartFinder = () => {
 
     setIsSearching(true);
     setHasSearched(true);
+    // start loading phrase rotation
+    setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random()*LOADING_PHRASES.length)]);
+    let phraseInterval = null;
+    try { playChime(); } catch {}
+    phraseInterval = setInterval(() => {
+      setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random()*LOADING_PHRASES.length)]);
+    }, 1400);
 
     try {
       const foundRecipes = await searchRecipesFromMultipleAPIs(ingredients);
@@ -2833,7 +2840,7 @@ const SmartFinder = () => {
                     </div>
 
                     <div className="recipe-tips">
-                      <h4>�� Chef's Tips</h4>
+                      <h4>💡 Chef's Tips</h4>
                       <ul>
                         <li>Taste and adjust seasonings as you cook for the best flavor balance.</li>
                         <li>Use fresh ingredients when possible for maximum taste and nutrition.</li>
