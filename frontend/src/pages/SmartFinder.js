@@ -1896,6 +1896,8 @@ const SmartFinder = () => {
       setRecipes([]);
     } finally {
       setIsSearching(false);
+      try { clearInterval(phraseInterval); } catch (e) {}
+      setTimeout(() => setLoadingPhrase(''), 500);
     }
   };
 
