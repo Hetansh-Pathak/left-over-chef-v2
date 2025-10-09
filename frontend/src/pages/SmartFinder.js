@@ -65,6 +65,50 @@ const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=636&h=393&fit=crop&auto=format&q=80'  // Sandwich
 ];
 
+const LOADING_PHRASES = [
+  'Stirring up something delicious…',
+  'Transforming your leftovers into magic!',
+  'Slicing, dicing and mixing flavors…',
+  'Tasting the possibilities…',
+  'Chef is on it — adding a pinch of love!'
+];
+
+const playChime = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(880, ctx.currentTime);
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.01);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    o.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.25);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    setTimeout(() => { try { o.stop(); ctx.close(); } catch (e) {} }, 600);
+  } catch (e) {
+    // ignore audio errors
+  }
+};
+
+const ChefMascot = styled.div`
+  position: absolute;
+  right: 1.5rem;
+  top: -30px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  transform-origin: center;
+  animation: float 3s ease-in-out infinite;
+  z-index: 5;
+  pointer-events: none;
+`;
+
 const getRecipeImage = (recipe, index = 0) => {
   const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
   const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
