@@ -74,6 +74,75 @@ const getRecipeImage = (recipe, index = 0) => {
   return `https://source.unsplash.com/636x393/?${query}&sig=${sig}`;
 };
 
+const GUJARATI_SPECIALS = [
+  {
+    id: 'guj_dal_dhokli',
+    title: 'Dal Dhokli (Gujarati Comfort Food)',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://images.unsplash.com/photo-1604908554027-08f25918e38a?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 45,
+    servings: 4,
+    rating: 4.6,
+    source: 'curated',
+    summary: 'Wheat flour dumplings simmered in a tangy-spicy dal. A wholesome, comforting one-pot meal from Gujarat.'
+  },
+  {
+    id: 'guj_khaman_dhokla',
+    title: 'Khaman Dhokla',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://images.unsplash.com/photo-1631452180519-a9b1b9a8efb2?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 30,
+    servings: 4,
+    rating: 4.7,
+    source: 'curated',
+    summary: 'Soft, fluffy steamed cake made from gram flour and tempered with mustard seeds and green chilies.'
+  },
+  {
+    id: 'guj_thepla',
+    title: 'Methi Thepla',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 35,
+    servings: 6,
+    rating: 4.5,
+    source: 'curated',
+    summary: 'Flatbreads flavored with fenugreek leaves and spices. Perfect for travel and tiffin.'
+  },
+  {
+    id: 'guj_undhiyu',
+    title: 'Undhiyu',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://images.unsplash.com/photo-1604908177735-9e3a9089c9e2?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 60,
+    servings: 6,
+    rating: 4.8,
+    source: 'curated',
+    summary: 'A hearty mixed vegetable delicacy from Surat, slow-cooked with spices and muthia.'
+  },
+  {
+    id: 'guj_kadhi_khichdi',
+    title: 'Kadhi-Khichdi',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://images.unsplash.com/photo-1589927986089-35812388d1a3?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 30,
+    servings: 4,
+    rating: 4.6,
+    source: 'curated',
+    summary: 'Comforting yogurt-based curry served with spiced rice-lentil khichdi—soul food.'
+  },
+  {
+    id: 'guj_handvo',
+    title: 'Handvo',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://images.unsplash.com/photo-1546549031-8eb8f1d5b42f?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 50,
+    servings: 6,
+    rating: 4.4,
+    source: 'curated',
+    summary: 'Savory lentil-rice cake with vegetables and sesame tempering; crispy outside, soft inside.'
+  }
+];
+
 const splitSteps = (recipe) => {
   if (recipe?.analyzedInstructions?.[0]?.steps?.length) {
     return recipe.analyzedInstructions[0].steps.map(s => s.step || s.text).filter(Boolean);
@@ -1747,7 +1816,7 @@ const SmartFinder = () => {
   const generateStars = (rating) => {
     const stars = Math.floor(rating || 0);
     const hasHalf = (rating % 1) >= 0.5;
-    return '★'.repeat(stars) + (hasHalf ? '���' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
+    return '★'.repeat(stars) + (hasHalf ? '☆' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
   };
 
   const sortRecipes = (recipesToSort) => {
