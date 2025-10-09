@@ -1,4 +1,5 @@
 const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { passport, verifyGoogleToken } = require('../config/oauth');
