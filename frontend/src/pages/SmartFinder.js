@@ -2249,7 +2249,7 @@ const SmartFinder = () => {
                 onClick={() => { setSelectedRecipe(r); setShowModal(true); }}
               >
                 <SpecialImage>
-                  <img src={r.image} alt={r.title} />
+                  <img src={r.image} alt={r.title} onError={(e) => { try { e.target.onerror = null; e.target.src = r.fallback || FALLBACK_IMAGES[(hashString(r.id||r.title)+idx) % FALLBACK_IMAGES.length]; } catch (err) {} }} />
                 </SpecialImage>
                 <SpecialTitle>{r.title}</SpecialTitle>
                 <SpecialSummary>{r.summary}</SpecialSummary>
