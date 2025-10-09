@@ -2915,11 +2915,6 @@ const SmartFinder = () => {
         )}
       </AnimatePresence>
         </div>
-        <div style={{ width: 340 }}>
-          <PantryPanel />
-          <div style={{ height: 16 }} />
-          <AchievementsPanel />
-        </div>
       </div>
     </FinderContainer>
   );
