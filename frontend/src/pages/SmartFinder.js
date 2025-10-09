@@ -753,8 +753,16 @@ const RecipeCard = styled(motion.div)`
         background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
         color: white;
       }
+      &.eco {
+        background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);
+        color: white;
+      }
+      &.zeroWaste {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+      }
     }
-    
+
     .favorite-btn {
       position: absolute;
       top: 1rem;
