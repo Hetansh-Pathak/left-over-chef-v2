@@ -5,11 +5,54 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export const pantryGet = (userId='demo') => api.get(`/pantry?userId=${encodeURIComponent(userId)}`).then(r=>r.data);
-export const pantrySave = (items, userId='demo') => api.post('/pantry', { userId, items }).then(r=>r.data);
-export const pantryRemove = (name, userId='demo') => api.delete(`/pantry?userId=${encodeURIComponent(userId)}&name=${encodeURIComponent(name)}`).then(r=>r.data);
+export const pantryGet = async (userId='demo') => {
+  try {
+    const r = await api.get(`/pantry?userId=${encodeURIComponent(userId)}`);
+    return r.data;
+  } catch (e) {
+    console.error('pantryGet error', e && e.response ? e.response.data : e.message || e);
+    return { items: [] };
+  }
+};
 
-export const achievementsGet = (userId='demo') => api.get(`/achievements?userId=${encodeURIComponent(userId)}`).then(r=>r.data);
-export const achievementsUnlock = (payload) => api.post('/achievements/unlock', payload).then(r=>r.data);
+export const pantrySave = async (items, userId='demo') => {
+  try {
+    const r = await api.post('/pantry', { userId, items });
+    return r.data;
+  } catch (e) {
+    console.error('pantrySave error', e && e.response ? e.response.data : e.message || e);
+    throw e;
+  }
+};
+
+export const pantryRemove = async (name, userId='demo') => {
+  try {
+    const r = await api.delete(`/pantry?userId=${encodeURIComponent(userId)}&name=${encodeURIComponent(name)}`);
+    return r.data;
+  } catch (e) {
+    console.error('pantryRemove error', e && e.response ? e.response.data : e.message || e);
+    throw e;
+  }
+};
+
+export const achievementsGet = async (userId='demo') => {
+  try {
+    const r = await api.get(`/achievements?userId=${encodeURIComponent(userId)}`);
+    return r.data;
+  } catch (e) {
+    console.error('achievementsGet error', e && e.response ? e.response.data : e.message || e);
+    return { achievements: [], points: 0, streak: 0 };
+  }
+};
+
+export const achievementsUnlock = async (payload) => {
+  try {
+    const r = await api.post('/achievements/unlock', payload);
+    return r.data;
+  } catch (e) {
+    console.error('achievementsUnlock error', e && e.response ? e.response.data : e.message || e);
+    throw e;
+  }
+};
 
 export default api;
