@@ -2224,35 +2224,31 @@ const SmartFinder = () => {
           </div>
         </QuickSuggestions>
 
-        <div style={{ marginTop: '2rem' }}>
-          <div className="suggestions-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <FaStar className="title-icon" /> Gujarati Specials
-          </div>
-          <div className="suggestions-grid">
+        <SpecialsSection>
+          <div className="title"><FaStar className="title-icon" /> Gujarati Specials</div>
+          <div className="grid">
             {GUJARATI_SPECIALS.map((r, idx) => (
-              <motion.div
+              <SpecialCard
                 key={r.id}
-                className="suggestion-category"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 * idx, duration: 0.4 }}
                 onClick={() => { setSelectedRecipe(r); setShowModal(true); }}
-                style={{ cursor: 'pointer' }}
               >
-                <div style={{ height: 180, overflow: 'hidden', borderRadius: 12, marginBottom: 12 }}>
-                  <img src={r.image} alt={r.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <div style={{ fontWeight: 800, color: '#2D3748', marginBottom: 6 }}>{r.title}</div>
-                <div style={{ color: '#718096', fontSize: 14 }}>{r.summary}</div>
+                <SpecialImage>
+                  <img src={r.image} alt={r.title} />
+                </SpecialImage>
+                <SpecialTitle>{r.title}</SpecialTitle>
+                <SpecialSummary>{r.summary}</SpecialSummary>
                 <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <SuggestionChip whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={(e) => { e.stopPropagation(); setIngredients(['dal','wheat flour','ghee','peanuts']); toast.success('Ingredients added for Dal Dhokli', { icon: '🍲' }); }}>Dal Dhokli</SuggestionChip>
                   <SuggestionChip whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={(e) => { e.stopPropagation(); setIngredients(['besan','mustard seeds','green chili','curd']); toast.success('Ingredients added for Khaman Dhokla', { icon: '🟡' }); }}>Khaman Dhokla</SuggestionChip>
                   <SuggestionChip whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={(e) => { e.stopPropagation(); setIngredients(['methi','wheat flour','yogurt','spices']); toast.success('Ingredients added for Methi Thepla', { icon: '🫓' }); }}>Methi Thepla</SuggestionChip>
                 </div>
-              </motion.div>
+              </SpecialCard>
             ))}
           </div>
-        </div>
+        </SpecialsSection>
       </SearchSection>
 
       <AnimatePresence>
