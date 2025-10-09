@@ -20,11 +20,34 @@ import {
   FaSpinner,
   FaMapMarkerAlt,
   FaUser,
-  FaAward
+  FaAward,
+  FaMicrophone,
+  FaMicrophoneSlash,
+  FaVolumeUp,
+  FaRandom
 } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import gujaratiImageMap from '../data/gujaratiImageMap.json';
+import PantryPanel from '../components/PantryPanel';
+import AchievementsPanel from '../components/AchievementsPanel';
+
+const normalizeKey = (s = '') => s.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const getRecipeImage = (recipe = {}, index = 0) => {
+  try {
+    const title = (recipe.title || recipe.name || '').toLowerCase();
+    const key = normalizeKey(title);
+    if (key && gujaratiImageMap[key]) return gujaratiImageMap[key];
+    if (recipe.image) return recipe.image;
+    if (recipe.images && recipe.images.length) return recipe.images[0];
+    const fallbackIndex = (hashString(title + (recipe.cuisines?.[0] || '')) + index) % FALLBACK_IMAGES.length;
+    return FALLBACK_IMAGES[fallbackIndex];
+  } catch (e) {
+    return FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
+  }
+}
 
 // Configurable savings assumptions (₹)
 const SAVINGS_CONFIG = {
@@ -61,14 +84,126 @@ const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=636&h=393&fit=crop&auto=format&q=80'  // Sandwich
 ];
 
-const getRecipeImage = (recipe, index = 0) => {
-  const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
-  const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
-  const terms = [title, cuisine].filter(Boolean).join(' ');
-  const sig = (hashString(terms) + index) % 1000;
-  const query = encodeURIComponent(terms || 'food dish');
-  return `https://source.unsplash.com/636x393/?${query}&sig=${sig}`;
+const LOADING_PHRASES = [
+  'Stirring up something delicious…',
+  'Transforming your leftovers into magic!',
+  'Slicing, dicing and mixing flavors…',
+  'Tasting the possibilities…',
+  'Chef is on it — adding a pinch of love!'
+];
+
+const playChime = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(880, ctx.currentTime);
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.01);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    o.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.25);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    setTimeout(() => { try { o.stop(); ctx.close(); } catch (e) {} }, 600);
+  } catch (e) {
+    // ignore audio errors
+  }
 };
+
+const ChefMascot = styled.div`
+  position: absolute;
+  right: 1.5rem;
+  top: -30px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  transform-origin: center;
+  animation: float 3s ease-in-out infinite;
+  z-index: 5;
+  pointer-events: none;
+`;
+
+
+const GUJARATI_SPECIALS = [
+  {
+    id: 'guj_dal_dhokli',
+    title: 'Dal Dhokli (Gujarati Comfort Food)',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://cdn.pixabay.com/photo/2015/09/09/18/22/indian-food-933193_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1604908554027-08f25918e38a?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 45,
+    servings: 4,
+    rating: 4.6,
+    source: 'curated',
+    summary: 'Wheat flour dumplings simmered in a tangy-spicy dal. A wholesome, comforting one-pot meal from Gujarat.'
+  },
+  {
+    id: 'guj_khaman_dhokla',
+    title: 'Khaman Dhokla',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://cdn.pixabay.com/photo/2018/10/14/21/25/india-3741854_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1631452180519-a9b1b9a8efb2?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 30,
+    servings: 4,
+    rating: 4.7,
+    source: 'curated',
+    summary: 'Soft, fluffy steamed cake made from gram flour and tempered with mustard seeds and green chilies.'
+  },
+  {
+    id: 'guj_thepla',
+    title: 'Methi Thepla',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://cdn.pixabay.com/photo/2016/11/18/15/04/food-1833345_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 35,
+    servings: 6,
+    rating: 4.5,
+    source: 'curated',
+    summary: 'Flatbreads flavored with fenugreek leaves and spices. Perfect for travel and tiffin.'
+  },
+  {
+    id: 'guj_undhiyu',
+    title: 'Undhiyu',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://cdn.pixabay.com/photo/2016/11/18/16/20/food-1834721_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1604908177735-9e3a9089c9e2?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 60,
+    servings: 6,
+    rating: 4.8,
+    source: 'curated',
+    summary: 'A hearty mixed vegetable delicacy from Surat, slow-cooked with spices and muthia.'
+  },
+  {
+    id: 'guj_kadhi_khichdi',
+    title: 'Kadhi-Khichdi',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://cdn.pixabay.com/photo/2016/03/05/19/02/asian-1238615_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1589927986089-35812388d1a3?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 30,
+    servings: 4,
+    rating: 4.6,
+    source: 'curated',
+    summary: 'Comforting yogurt-based curry served with spiced rice-lentil khichdi—soul food.'
+  },
+  {
+    id: 'guj_handvo',
+    title: 'Handvo',
+    cuisines: ['Gujarati', 'Indian'],
+    image: 'https://cdn.pixabay.com/photo/2015/03/26/09/39/bowl-690032_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1546549031-8eb8f1d5b42f?w=900&h=600&fit=crop&auto=format&q=80',
+    readyInMinutes: 50,
+    servings: 6,
+    rating: 4.4,
+    source: 'curated',
+    summary: 'Savory lentil-rice cake with vegetables and sesame tempering; crispy outside, soft inside.'
+  }
+];
+
 
 const splitSteps = (recipe) => {
   if (recipe?.analyzedInstructions?.[0]?.steps?.length) {
@@ -98,6 +233,38 @@ const splitSteps = (recipe) => {
     'Plate and serve.'
   ];
 };
+
+const computeGreenScore = (recipe = {}, inputIngredients = []) => {
+  const title = (recipe.title || recipe.name || '').toLowerCase();
+  const list = (recipe.extendedIngredients || []).map(i => (i.original || i.name || '').toLowerCase());
+  const text = (title + ' ' + list.join(' ')).toLowerCase();
+  let score = 50;
+  const isVeg = /(dal|lentil|chana|rajma|paneer|tofu|veg|vegetable|sabzi|bhaji|salad|thepla|kadhi|khichdi)/.test(text);
+  const hasLegumes = /(dal|lentil|chickpea|chana|rajma|moong|masoor)/.test(text);
+  const hasRedMeat = /(mutton|beef|pork|lamb)/.test(text);
+  const hasPoultry = /(chicken|turkey)/.test(text);
+  score += isVeg ? 25 : 0;
+  score += hasLegumes ? 15 : 0;
+  score -= hasRedMeat ? 20 : 0;
+  score -= hasPoultry ? 10 : 0;
+  const time = recipe.readyInMinutes || 30;
+  score += time <= 25 ? 10 : time <= 45 ? 5 : 0;
+  const match = inputIngredients.length ? (inputIngredients.filter(i => text.includes(i.toLowerCase())).length / Math.max(1, inputIngredients.length)) : 0;
+  score += match >= 0.7 ? 10 : match >= 0.4 ? 5 : 0;
+  return Math.max(0, Math.min(100, Math.round(score)));
+};
+
+const getEcoBadges = (recipe, inputIngredients) => {
+  const badges = [];
+  const score = computeGreenScore(recipe, inputIngredients);
+  if (score >= 80) badges.push({ text: 'Eco Hero', className: 'eco' });
+  const text = (recipe.title || recipe.name || '').toLowerCase() + ' ' + (recipe.extendedIngredients||[]).map(i=> (i.original||'').toLowerCase()).join(' ');
+  const zeroWaste = inputIngredients.length > 0 && inputIngredients.every(i => text.includes(i.toLowerCase()));
+  if (zeroWaste) badges.push({ text: 'Zero Waste Chef', className: 'zeroWaste' });
+  badges.push({ text: `Green ${score}`, className: 'eco' });
+  return badges;
+};
+
 const FinderContainer = styled(motion.div)`
   max-width: 1400px;
   margin: 0 auto;
@@ -494,7 +661,7 @@ const SuggestionChip = styled(motion.button)`
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -502,6 +669,61 @@ const SuggestionChip = styled(motion.button)`
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
     border-color: transparent;
   }
+`;
+
+const SpecialsSection = styled.div`
+  margin-top: 2rem;
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #2D3748;
+    margin-bottom: 1rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+`;
+
+const SpecialCard = styled(motion.div)`
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  }
+`;
+
+const SpecialImage = styled.div`
+  height: 180px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 12px;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+`;
+
+const SpecialTitle = styled.div`
+  font-weight: 800;
+  color: #2D3748;
+  margin-bottom: 6px;
+`;
+
+const SpecialSummary = styled.div`
+  color: #718096;
+  font-size: 0.9rem;
 `;
 
 const ResultsSection = styled(motion.div)`
@@ -648,8 +870,16 @@ const RecipeCard = styled(motion.div)`
         background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
         color: white;
       }
+      &.eco {
+        background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);
+        color: white;
+      }
+      &.zeroWaste {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+      }
     }
-    
+
     .favorite-btn {
       position: absolute;
       top: 1rem;
@@ -1362,6 +1592,10 @@ const SmartFinder = () => {
   const [showModal, setShowModal] = useState(false);
   const inputRef = useRef(null);
 
+  // Surprise Me rotation state
+  const [surpriseIndex, setSurpriseIndex] = useState(-1);
+  const [surprisePoolKey, setSurprisePoolKey] = useState('');
+
   // Save state to localStorage whenever key state changes
   useEffect(() => {
     const stateToSave = {
@@ -1582,6 +1816,8 @@ const SmartFinder = () => {
     return allRecipes;
   };
 
+  const [loadingPhrase, setLoadingPhrase] = useState('');
+
   const searchRecipes = async () => {
     if (ingredients.length === 0) {
       toast.error('Please add at least one ingredient!', {
@@ -1598,6 +1834,13 @@ const SmartFinder = () => {
 
     setIsSearching(true);
     setHasSearched(true);
+    // start loading phrase rotation
+    setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random()*LOADING_PHRASES.length)]);
+    let phraseInterval = null;
+    try { playChime(); } catch {}
+    phraseInterval = setInterval(() => {
+      setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random()*LOADING_PHRASES.length)]);
+    }, 1400);
 
     try {
       const foundRecipes = await searchRecipesFromMultipleAPIs(ingredients);
@@ -1664,6 +1907,8 @@ const SmartFinder = () => {
       setRecipes([]);
     } finally {
       setIsSearching(false);
+      try { clearInterval(phraseInterval); } catch (e) {}
+      setTimeout(() => setLoadingPhrase(''), 500);
     }
   };
 
@@ -1743,7 +1988,7 @@ const SmartFinder = () => {
   const generateStars = (rating) => {
     const stars = Math.floor(rating || 0);
     const hasHalf = (rating % 1) >= 0.5;
-    return '★'.repeat(stars) + (hasHalf ? '☆' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
+    return '★'.repeat(stars) + (hasHalf ? '��' : '') + '☆'.repeat(Math.max(0, 5 - stars - (hasHalf ? 1 : 0)));
   };
 
   const sortRecipes = (recipesToSort) => {
@@ -1761,7 +2006,7 @@ const SmartFinder = () => {
     }
   };
 
-  const getRecipeBadges = (recipe) => {
+  const getRecipeBadges = (recipe, inputIngredients) => {
     const badges = [];
     if (recipe.readyInMinutes && recipe.readyInMinutes <= 30) {
       badges.push({ text: 'Quick', className: 'quick' });
@@ -1772,7 +2017,6 @@ const SmartFinder = () => {
     if (recipe.aggregateLikes && recipe.aggregateLikes > 100) {
       badges.push({ text: 'Popular', className: 'popular' });
     }
-    // Check for Indian cuisine
     if ((recipe.cuisines && recipe.cuisines.some(c => c.toLowerCase().includes('indian'))) ||
         (recipe.title && (recipe.title.toLowerCase().includes('curry') ||
                          recipe.title.toLowerCase().includes('dal') ||
@@ -1780,6 +2024,8 @@ const SmartFinder = () => {
                          recipe.title.toLowerCase().includes('chapati')))) {
       badges.push({ text: 'Indian', className: 'indian' });
     }
+    const eco = getEcoBadges(recipe, inputIngredients);
+    eco.forEach(b => badges.push(b));
     return badges;
   };
 
@@ -1791,7 +2037,9 @@ const SmartFinder = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <Header
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <Header
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.8 }}
@@ -1800,10 +2048,20 @@ const SmartFinder = () => {
           <span className="accent">Smart Recipe</span> Finder
         </h1>
         <p className="subtitle">
-          Discover amazing recipes from around the world using your available ingredients. 
+          Discover amazing recipes from around the world using your available ingredients.
           Specializing in Indian cuisine and authentic flavors.
         </p>
+        {isSearching && (
+          <div style={{ marginTop: 12, fontWeight: 700, color: '#2D3748' }}>{loadingPhrase}</div>
+        )}
         <div className="stats">
+          {isSearching && (
+            <ChefMascot>
+              <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+                🍳
+              </motion.div>
+            </ChefMascot>
+          )}
           <div className="stat-item">
             <FaUtensils className="stat-icon" />
             <div className="stat-number">15,000+</div>
@@ -1921,6 +2179,104 @@ const SmartFinder = () => {
             )}
           </ActionButton>
 
+          <ActionButton
+            onClick={() => {
+              try {
+                const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SR) {
+                  toast.error('Voice not supported in this browser');
+                  return;
+                }
+                const rec = new SR();
+                rec.lang = 'en-IN';
+                rec.interimResults = false;
+                rec.maxAlternatives = 1;
+                rec.onresult = (e) => {
+                  const transcript = e.results[0][0].transcript || '';
+                  const cleaned = transcript.toLowerCase().replace(/chef[, ]*/g,'').replace(/what can i make with /,'');
+                  const parts = cleaned.split(/,| and | with /).map(s=>s.trim()).filter(Boolean);
+                  if (parts.length) {
+                    setIngredients(Array.from(new Set(parts)));
+                    toast.success(`Heard: ${parts.join(', ')}`, { icon: '🎙️' });
+                  }
+                };
+                rec.onerror = () => {};
+                rec.start();
+              } catch (e) {
+                toast.error('Unable to start voice');
+              }
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ rotate: 10, scale: 0.98 }}
+          >
+            <FaMicrophone className="button-icon" />
+            Voice
+          </ActionButton>
+
+          <ActionButton
+            onClick={() => {
+              try {
+                const utter = new SpeechSynthesisUtterance();
+                const text = ingredients.length ? `Searching recipes with ${ingredients.join(', ')}` : 'Add ingredients or try Surprise Me.';
+                utter.text = text;
+                utter.lang = 'en-IN';
+                window.speechSynthesis && window.speechSynthesis.speak(utter);
+              } catch {}
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FaVolumeUp className="button-icon" />
+            Speak
+          </ActionButton>
+
+          <ActionButton
+            onClick={async () => {
+              const pool = recipes.length ? recipes : GUJARATI_SPECIALS;
+              const poolKey = recipes.length ? 'results' : 'gujarat';
+              // reset if pool changed
+              let baseIndex = surpriseIndex;
+              if (surprisePoolKey !== poolKey) baseIndex = -1;
+              const nextIndex = (baseIndex + 1) % Math.max(1, pool.length);
+              setSurpriseIndex(nextIndex);
+              setSurprisePoolKey(poolKey);
+              const pick = pool[nextIndex];
+              if (pick) {
+                setSelectedRecipe(pick);
+                setShowModal(true);
+              }
+              // confetti burst
+              const end = Date.now() + 800;
+              const frame = () => {
+                const colors = ['#667eea','#764ba2','#22c55e','#f59e0b','#ef4444'];
+                const el = document.createElement('div');
+                el.style.position='fixed';
+                el.style.top='-10px';
+                el.style.left=Math.random()*100+'%';
+                el.style.width='8px';
+                el.style.height='8px';
+                el.style.borderRadius='50%';
+                el.style.background=colors[Math.floor(Math.random()*colors.length)];
+                el.style.zIndex=99999;
+                el.style.transform=`translateY(0)`;
+                el.style.transition='transform 1s ease, opacity 1s ease';
+                document.body.appendChild(el);
+                requestAnimationFrame(()=>{
+                  el.style.transform=`translateY(${window.innerHeight+20}px)`;
+                  el.style.opacity='0';
+                });
+                setTimeout(()=>document.body.removeChild(el),1200);
+                if (Date.now()<end) requestAnimationFrame(frame);
+              };
+              frame();
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ rotate: 360, scale: 0.95 }}
+          >
+            <FaRandom className="button-icon" />
+            Surprise Me
+          </ActionButton>
+
           {ingredients.length > 0 && (
             <ActionButton
               onClick={clearAll}
@@ -1967,6 +2323,7 @@ const SmartFinder = () => {
             ))}
           </div>
         </QuickSuggestions>
+
       </SearchSection>
 
       <AnimatePresence>
@@ -2017,7 +2374,7 @@ const SmartFinder = () => {
             ) : sortedRecipes.length > 0 ? (
               <RecipeGrid>
                 {sortedRecipes.map((recipe, index) => {
-                  const badges = getRecipeBadges(recipe);
+                  const badges = getRecipeBadges(recipe, ingredients);
                   const recipeId = recipe._id || recipe.id || index;
                   
                   return (
@@ -2411,7 +2768,7 @@ const SmartFinder = () => {
                     </div>
 
                     <div className="recipe-nutrition">
-                      <h4>🍽️ Nutrition Info (per serving)</h4>
+                      <h4>����️ Nutrition Info (per serving)</h4>
                       <div className="nutrition-grid">
                         <div className="nutrition-item">
                           <span className="label">Calories</span>
@@ -2557,6 +2914,13 @@ const SmartFinder = () => {
           </ModalOverlay>
         )}
       </AnimatePresence>
+        </div>
+        <div style={{ width: 340 }}>
+          <PantryPanel />
+          <div style={{ height: 16 }} />
+          <AchievementsPanel />
+        </div>
+      </div>
     </FinderContainer>
   );
 };
