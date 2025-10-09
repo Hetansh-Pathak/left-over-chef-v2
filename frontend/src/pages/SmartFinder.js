@@ -79,7 +79,8 @@ const GUJARATI_SPECIALS = [
     id: 'guj_dal_dhokli',
     title: 'Dal Dhokli (Gujarati Comfort Food)',
     cuisines: ['Gujarati', 'Indian'],
-    image: 'https://images.unsplash.com/photo-1604908554027-08f25918e38a?w=900&h=600&fit=crop&auto=format&q=80',
+    image: 'https://cdn.pixabay.com/photo/2015/09/09/18/22/indian-food-933193_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1604908554027-08f25918e38a?w=900&h=600&fit=crop&auto=format&q=80',
     readyInMinutes: 45,
     servings: 4,
     rating: 4.6,
@@ -90,7 +91,8 @@ const GUJARATI_SPECIALS = [
     id: 'guj_khaman_dhokla',
     title: 'Khaman Dhokla',
     cuisines: ['Gujarati', 'Indian'],
-    image: 'https://images.unsplash.com/photo-1631452180519-a9b1b9a8efb2?w=900&h=600&fit=crop&auto=format&q=80',
+    image: 'https://cdn.pixabay.com/photo/2018/10/14/21/25/india-3741854_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1631452180519-a9b1b9a8efb2?w=900&h=600&fit=crop&auto=format&q=80',
     readyInMinutes: 30,
     servings: 4,
     rating: 4.7,
@@ -101,7 +103,8 @@ const GUJARATI_SPECIALS = [
     id: 'guj_thepla',
     title: 'Methi Thepla',
     cuisines: ['Gujarati', 'Indian'],
-    image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=900&h=600&fit=crop&auto=format&q=80',
+    image: 'https://cdn.pixabay.com/photo/2016/11/18/15/04/food-1833345_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=900&h=600&fit=crop&auto=format&q=80',
     readyInMinutes: 35,
     servings: 6,
     rating: 4.5,
@@ -112,7 +115,8 @@ const GUJARATI_SPECIALS = [
     id: 'guj_undhiyu',
     title: 'Undhiyu',
     cuisines: ['Gujarati', 'Indian'],
-    image: 'https://images.unsplash.com/photo-1604908177735-9e3a9089c9e2?w=900&h=600&fit=crop&auto=format&q=80',
+    image: 'https://cdn.pixabay.com/photo/2016/11/18/16/20/food-1834721_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1604908177735-9e3a9089c9e2?w=900&h=600&fit=crop&auto=format&q=80',
     readyInMinutes: 60,
     servings: 6,
     rating: 4.8,
@@ -123,7 +127,8 @@ const GUJARATI_SPECIALS = [
     id: 'guj_kadhi_khichdi',
     title: 'Kadhi-Khichdi',
     cuisines: ['Gujarati', 'Indian'],
-    image: 'https://images.unsplash.com/photo-1589927986089-35812388d1a3?w=900&h=600&fit=crop&auto=format&q=80',
+    image: 'https://cdn.pixabay.com/photo/2016/03/05/19/02/asian-1238615_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1589927986089-35812388d1a3?w=900&h=600&fit=crop&auto=format&q=80',
     readyInMinutes: 30,
     servings: 4,
     rating: 4.6,
@@ -134,7 +139,8 @@ const GUJARATI_SPECIALS = [
     id: 'guj_handvo',
     title: 'Handvo',
     cuisines: ['Gujarati', 'Indian'],
-    image: 'https://images.unsplash.com/photo-1546549031-8eb8f1d5b42f?w=900&h=600&fit=crop&auto=format&q=80',
+    image: 'https://cdn.pixabay.com/photo/2015/03/26/09/39/bowl-690032_1280.jpg',
+    fallback: 'https://images.unsplash.com/photo-1546549031-8eb8f1d5b42f?w=900&h=600&fit=crop&auto=format&q=80',
     readyInMinutes: 50,
     servings: 6,
     rating: 4.4,
@@ -142,6 +148,7 @@ const GUJARATI_SPECIALS = [
     summary: 'Savory lentil-rice cake with vegetables and sesame tempering; crispy outside, soft inside.'
   }
 ];
+
 
 const splitSteps = (recipe) => {
   if (recipe?.analyzedInstructions?.[0]?.steps?.length) {
