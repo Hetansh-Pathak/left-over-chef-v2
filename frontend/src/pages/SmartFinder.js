@@ -1530,6 +1530,10 @@ const SmartFinder = () => {
   const [showModal, setShowModal] = useState(false);
   const inputRef = useRef(null);
 
+  // Surprise Me rotation state
+  const [surpriseIndex, setSurpriseIndex] = useState(-1);
+  const [surprisePoolKey, setSurprisePoolKey] = useState('');
+
   // Save state to localStorage whenever key state changes
   useEffect(() => {
     const stateToSave = {
@@ -2695,7 +2699,7 @@ const SmartFinder = () => {
                     </div>
 
                     <div className="recipe-nutrition">
-                      <h4>🍽️ Nutrition Info (per serving)</h4>
+                      <h4>����️ Nutrition Info (per serving)</h4>
                       <div className="nutrition-grid">
                         <div className="nutrition-item">
                           <span className="label">Calories</span>
