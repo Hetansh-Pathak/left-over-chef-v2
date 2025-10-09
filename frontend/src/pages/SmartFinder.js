@@ -126,14 +126,6 @@ const ChefMascot = styled.div`
   pointer-events: none;
 `;
 
-const getRecipeImage = (recipe, index = 0) => {
-  const title = (recipe?.title || recipe?.name || 'recipe').toLowerCase();
-  const cuisine = (recipe?.cuisines?.[0] || '').toLowerCase();
-  const terms = [title, cuisine].filter(Boolean).join(' ');
-  const sig = (hashString(terms) + index) % 1000;
-  const query = encodeURIComponent(terms || 'food dish');
-  return `https://source.unsplash.com/636x393/?${query}&sig=${sig}`;
-};
 
 const GUJARATI_SPECIALS = [
   {
