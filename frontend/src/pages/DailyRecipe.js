@@ -173,8 +173,7 @@ const DailyRecipe = () => {
   const title = dailyRecipe?.title || dailyRecipe?.name || 'Featured Recipe';
   const description = dailyRecipe?.summary || dailyRecipe?.description || '';
   const totalMinutes = (
-    dailyRecipe?.readyInMinutes ??
-    ((dailyRecipe?.prepTime || 0) + (dailyRecipe?.cookTime || 0)) ||
+    (dailyRecipe?.readyInMinutes ?? ((dailyRecipe?.prepTime || 0) + (dailyRecipe?.cookTime || 0))) ||
     30
   );
   const servings = dailyRecipe?.servings || 4;
