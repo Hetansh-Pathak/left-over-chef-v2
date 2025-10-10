@@ -447,7 +447,7 @@ const Home = () => {
         {actionCards.map((card, index) => {
           const IconComponent = card.icon;
           return (
-            <Link key={card.title} to={card.link} style={{ textDecoration: 'none' }}>
+            <ActionLink key={card.title} to={card.link}>
               <ActionCard
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -465,7 +465,7 @@ const Home = () => {
                   <IconComponent />
                 </div>
               </ActionCard>
-            </Link>
+            </ActionLink>
           );
         })}
       </QuickActionsGrid>
