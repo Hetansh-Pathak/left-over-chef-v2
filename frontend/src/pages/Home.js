@@ -115,6 +115,10 @@ const QuickActionsGrid = styled(motion.div)`
   margin-bottom: 4rem;
 `;
 
+const ActionLink = styled(Link)`
+  text-decoration: none;
+`;
+
 const ActionCard = styled(motion.div)`
   background: white;
   border-radius: ${props => props.theme.borderRadius};
