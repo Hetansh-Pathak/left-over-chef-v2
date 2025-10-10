@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaStar, FaClock, FaUsers, FaFire, FaHeart } from 'react-icons/fa';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const DailyContainer = styled(motion.div)`
   max-width: 1000px;
@@ -17,7 +18,7 @@ const PageHeader = styled(motion.div)`
   .page-title {
     font-size: 3rem;
     font-weight: 700;
-    color: ${props => props.theme.colors.primary}; /* Fallback color */
+    color: ${props => props.theme.colors.primary};
     background: ${props => props.theme.colors.gradient};
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -28,7 +29,6 @@ const PageHeader = styled(motion.div)`
     justify-content: center;
     gap: 1rem;
 
-    /* Fallback for browsers that don't support background-clip */
     @supports not (-webkit-background-clip: text) {
       color: ${props => props.theme.colors.primary};
       background: none;
@@ -85,6 +85,10 @@ const RecipeCard = styled(motion.div)`
         .meta-icon {
           color: ${props => props.theme.colors.primary};
         }
+
+        .rating-star {
+          color: ${props => props.theme.colors.gold};
+        }
       }
     }
     
@@ -111,6 +115,16 @@ const RecipeCard = styled(motion.div)`
   }
 `;
 
+const LoadingWrapper = styled.div`
+  text-align: center;
+  padding: 4rem;
+`;
+
+const LoadingSpinner = styled(motion.div)`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
 const DailyRecipe = () => {
   const [dailyRecipe, setDailyRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -122,14 +136,12 @@ const DailyRecipe = () => {
         setDailyRecipe(response.data);
       } catch (error) {
         console.error('Error fetching daily recipe:', error);
-        // Set mock data
         setDailyRecipe({
           _id: '1',
           name: 'Leftover Vegetable Stir Fry',
           description: 'A quick and delicious way to use up leftover vegetables with a perfect blend of Asian flavors.',
           image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&h=400&fit=crop',
-          prepTime: 10,
-          cookTime: 8,
+          readyInMinutes: 18,
           servings: 4,
           difficulty: 'Easy',
           rating: 4.5
@@ -145,19 +157,30 @@ const DailyRecipe = () => {
   if (loading) {
     return (
       <DailyContainer>
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <motion.div
+        <LoadingWrapper>
+          <LoadingSpinner
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            style={{ fontSize: '3rem', marginBottom: '1rem' }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           >
             🍳
-          </motion.div>
+          </LoadingSpinner>
           <p>Loading today's featured recipe...</p>
-        </div>
+        </LoadingWrapper>
       </DailyContainer>
     );
   }
+
+  const title = dailyRecipe?.title || dailyRecipe?.name || 'Featured Recipe';
+  const description = dailyRecipe?.summary || dailyRecipe?.description || '';
+  const totalMinutes = (
+    (dailyRecipe?.readyInMinutes ?? ((dailyRecipe?.prepTime || 0) + (dailyRecipe?.cookTime || 0))) ||
+    30
+  );
+  const servings = dailyRecipe?.servings || 4;
+  const difficulty = dailyRecipe?.difficulty || 'Easy';
+  const rating = dailyRecipe?.rating;
+  const imageSrc = dailyRecipe?.image;
+  const detailLink = dailyRecipe?._id ? `/recipe/${dailyRecipe._id}` : '/smart-finder';
 
   return (
     <DailyContainer
@@ -182,46 +205,47 @@ const DailyRecipe = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
         >
-          <motion.img
-            src={dailyRecipe.image}
-            alt={dailyRecipe.name}
-            className="recipe-image"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          />
+          {imageSrc && (
+            <motion.img
+              src={imageSrc}
+              alt={title}
+              className="recipe-image"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+            />
+          )}
           
           <div className="recipe-content">
-            <div className="recipe-title">{dailyRecipe.name}</div>
-            <div className="recipe-description">{dailyRecipe.description}</div>
+            <div className="recipe-title">{title}</div>
+            {description && (
+              <div className="recipe-description">{description}</div>
+            )}
             
             <div className="recipe-meta">
               <div className="meta-item">
                 <FaClock className="meta-icon" />
-                <span>{dailyRecipe.prepTime + dailyRecipe.cookTime} min</span>
+                <span>{totalMinutes} min</span>
               </div>
               <div className="meta-item">
                 <FaUsers className="meta-icon" />
-                <span>{dailyRecipe.servings} servings</span>
+                <span>{servings} servings</span>
               </div>
               <div className="meta-item">
                 <FaFire className="meta-icon" />
-                <span>{dailyRecipe.difficulty}</span>
+                <span>{difficulty}</span>
               </div>
-              {dailyRecipe.rating && (
+              {typeof rating === 'number' && (
                 <div className="meta-item">
-                  <FaStar className="meta-icon" style={{ color: '#ffd700' }} />
-                  <span>{dailyRecipe.rating}/5</span>
+                  <FaStar className="meta-icon rating-star" />
+                  <span>{rating}/5</span>
                 </div>
               )}
             </div>
             
-            <a
-              href={`/recipe/${dailyRecipe._id}`}
-              className="cta-button"
-            >
+            <Link to={detailLink} className="cta-button">
               <FaHeart />
               View Full Recipe
-            </a>
+            </Link>
           </div>
         </RecipeCard>
       )}

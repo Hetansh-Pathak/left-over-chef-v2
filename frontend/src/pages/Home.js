@@ -115,6 +115,10 @@ const QuickActionsGrid = styled(motion.div)`
   margin-bottom: 4rem;
 `;
 
+const ActionLink = styled(Link)`
+  text-decoration: none;
+`;
+
 const ActionCard = styled(motion.div)`
   background: white;
   border-radius: ${props => props.theme.borderRadius};
@@ -195,7 +199,9 @@ const KitchenSection = styled(motion.section)`
 const PanelsGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
+  justify-content: center;
+  justify-items: center;
 `;
 
 const GallerySection = styled(motion.section)`
@@ -441,7 +447,7 @@ const Home = () => {
         {actionCards.map((card, index) => {
           const IconComponent = card.icon;
           return (
-            <Link key={card.title} to={card.link} style={{ textDecoration: 'none' }}>
+            <ActionLink key={card.title} to={card.link}>
               <ActionCard
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -459,7 +465,7 @@ const Home = () => {
                   <IconComponent />
                 </div>
               </ActionCard>
-            </Link>
+            </ActionLink>
           );
         })}
       </QuickActionsGrid>
