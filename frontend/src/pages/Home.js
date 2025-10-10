@@ -195,7 +195,9 @@ const KitchenSection = styled(motion.section)`
 const PanelsGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
+  justify-content: center;
+  justify-items: center;
 `;
 
 const GallerySection = styled(motion.section)`
